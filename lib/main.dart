@@ -65,8 +65,20 @@ class PhotosList extends StatelessWidget {
       ),
       itemCount: photos.length,
       itemBuilder: (context, index) {
-        return Image.network(photos[index].thumbnailUrl);
-      }
+        return FlatButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(),
+                  settings: RouteSettings(
+                    arguments: photos[index],
+                  ),
+                ),
+              );
+            },
+            child: Image.network(photos[index].thumbnailUrl));
+      },
     );
   }
 
@@ -80,4 +92,26 @@ Future<List<Photo>> fetchPhotos(http.Client client) async {
 List<Photo> parsePhotos(String responseBody) {
   final parsed  = jsonDecode(responseBody).cast<Map<String,dynamic>>();
   return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+}
+
+class DetailScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final Photo photo = ModalRoute.of(context).settings.arguments;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(photo.title),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(photo.url)
+          ],
+        ),
+      ),
+    );
+  }
 }
