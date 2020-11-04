@@ -72,9 +72,9 @@ class PhotosList extends StatelessWidget {
 
 }
 
-Future<List<Photo>> fetchPhotos(client) async {
+Future<List<Photo>> fetchPhotos(http.Client client) async {
   final response = await client.get('https://jsonplaceholder.typicode.com/photos');
-  return compute(response.body, parsePhotos);
+  return compute(parsePhotos, response.body);
 }
 
 List<Photo> parsePhotos(String responseBody) {
