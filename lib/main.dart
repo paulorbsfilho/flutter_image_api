@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:flutter_image_api/photo.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -29,13 +33,12 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-
+class _MyHomePageState extends State<MyHomePage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text('Images'),
       ),
       body: FutureBuilder<List<Photo>>(
         future: fetchPhotos(http.Client()),
@@ -45,12 +48,7 @@ class _MyHomePageState extends State<MyHomePage>
               ? PhotosList(photos: snapshot.data)
               : Center(child: CircularProgressIndicator());
         }
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      )
     );
   }
 }
@@ -60,22 +58,23 @@ class PhotosList extends StatelessWidget {
 
   PhotosList({Key key, this.photos}) : super(key : key);
   @override
-  WidgetBuild(BuildContext context){
+  Widget build(BuildContext context){
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
       ),
-      itemCount; photos.lenght,
+      itemCount: photos.length,
       itemBuilder: (context, index) {
-        return Image.network(photos[index].thumnailUrl);
+        return Image.network(photos[index].thumbnailUrl);
       }
     );
   }
+
 }
 
-Future<List<Photo>> fetchPhotos(http.Client client) async {
+Future<List<Photo>> fetchPhotos(client) async {
   final response = await client.get('https://jsonplaceholder.typicode.com/photos');
-  return compute(parsePhotos, response.body);
+  return compute(response.body, parsePhotos);
 }
 
 List<Photo> parsePhotos(String responseBody) {
